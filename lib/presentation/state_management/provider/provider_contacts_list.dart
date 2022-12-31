@@ -6,11 +6,14 @@ import '../../../utils/utils_app.dart';
 
 class ProviderContactsList extends ChangeNotifier {
   List<ContactsModel> _contactsModelList = [];
+  bool _receiveContactsList = true;
   int _indexList = -1;
 
   List<ContactsModel> get contactsModelListGet => _contactsModelList;
 
   int get indexListGet => _indexList;
+
+  bool get receiveContactsListGet => _receiveContactsList;
 
   void setContactsModelList(List<ContactsModel> contactsModelList) {
     _contactsModelList = contactsModelList;
@@ -22,17 +25,26 @@ class ProviderContactsList extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setReceiveContactsList(bool receiveContactsList) {
+    _receiveContactsList = receiveContactsList;
+    notifyListeners();
+  }
+
   void setIndexList(int indexList) {
     _indexList = indexList;
   }
 
   void getContactsFromPhone() {
+    setReceiveContactsList(true);
+
     UtilsApp.platform.invokeMethod(Constants.HANDLE_GET_CONTACTS);
   }
 
-  void deleteContact(String phoneNumber) {
-    UtilsApp.platform
-        .invokeMethod(Constants.HANDLE_DELETE_CONTACT, phoneNumber);
+  void deleteContact(String phone) {
+    UtilsApp.platform.invokeMethod(
+      Constants.HANDLE_DELETE_CONTACT,
+      {"phone": phone},
+    );
   }
 
   List<ContactsModel> convertStringToListContactsModel(var value) {

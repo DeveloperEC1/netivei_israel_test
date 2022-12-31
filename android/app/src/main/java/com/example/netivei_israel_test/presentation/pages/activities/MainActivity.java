@@ -1,11 +1,15 @@
 package com.example.netivei_israel_test.presentation.pages.activities;
 
+import static com.example.netivei_israel_test.core.Constants.ADD_CONTACT_TYPE;
 import static com.example.netivei_israel_test.core.Constants.CHANNEL;
 import static com.example.netivei_israel_test.core.Constants.DELETE_CONTACT_TYPE;
+import static com.example.netivei_israel_test.core.Constants.HANDLE_ADD_CONTACT;
 import static com.example.netivei_israel_test.core.Constants.HANDLE_DELETE_CONTACT;
 import static com.example.netivei_israel_test.core.Constants.HANDLE_GET_CONTACTS;
+import static com.example.netivei_israel_test.core.Constants.HANDLE_UPDATE_CONTACT;
 import static com.example.netivei_israel_test.core.Constants.PERMISSIONS_READ_CONTACTS;
 import static com.example.netivei_israel_test.core.Constants.PERMISSIONS_WRITE_CONTACTS;
+import static com.example.netivei_israel_test.core.Constants.UPDATE_CONTACT_TYPE;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -49,14 +53,18 @@ public class MainActivity extends FlutterActivity {
 
                 contactsViewModel.setFlutterEngine(flutterEngine);
 
-                if (call.arguments != null) {
-                    contactsViewModel.setCallArgumentsStr(call.arguments.toString());
-                }
+                contactsViewModel.setIdArgument(call.argument("id"));
+                contactsViewModel.setNameArgument(call.argument("name"));
+                contactsViewModel.setPhoneArgument(call.argument("phone"));
 
                 if (callMethod.equals(HANDLE_GET_CONTACTS)) {
                     contactsViewModel.handleGetContacts();
                 } else if (callMethod.equals(HANDLE_DELETE_CONTACT)) {
                     contactsViewModel.handleDeleteContact();
+                } else if (callMethod.equals(HANDLE_ADD_CONTACT)) {
+                    contactsViewModel.handleAddContact();
+                } else if (callMethod.equals(HANDLE_UPDATE_CONTACT)) {
+                    contactsViewModel.handleUpdateContact();
                 }
             }
         });
@@ -74,6 +82,10 @@ public class MainActivity extends FlutterActivity {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
                 if (contactsViewModel.getTypeWriteContacts().equals(DELETE_CONTACT_TYPE)) {
                     contactsViewModel.handleDeleteContact();
+                } else if (contactsViewModel.getTypeWriteContacts().equals(ADD_CONTACT_TYPE)) {
+                    contactsViewModel.handleAddContact();
+                } else if (contactsViewModel.getTypeWriteContacts().equals(UPDATE_CONTACT_TYPE)) {
+                    contactsViewModel.handleUpdateContact();
                 }
             }
         }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:netivei_israel_test/presentation/widgets/loading_widget.dart';
 import 'package:netivei_israel_test/utils/utils_app.dart';
 import 'package:provider/provider.dart';
+import '../../data/models/contacts_model.dart';
 import '../../utils/responsive_screen.dart';
 import '../../utils/shower_pages.dart';
 import '../state_management/provider/provider_contacts_list.dart';
@@ -64,14 +65,16 @@ class PageContactsListProvState extends State<PageContactsListProv> {
         IconButton(
           icon: const Icon(Icons.add),
           color: Colors.white,
-          onPressed: () => {},
+          onPressed: () => {
+            ShowerPages.pushPageAddEditContact(context, false, ContactsModel()),
+          },
         ),
       ],
     );
   }
 
   Widget _contactsList() {
-    if (_provider.contactsModelListGet.isEmpty) {
+    if (_provider.receiveContactsListGet) {
       return const LoadingWidget();
     } else {
       return Padding(
@@ -104,7 +107,15 @@ class PageContactsListProvState extends State<PageContactsListProv> {
               IconButton(
                 icon: const Icon(Icons.edit),
                 color: Colors.blueAccent,
-                onPressed: () => {},
+                onPressed: () => {
+                  ShowerPages.pushPageAddEditContact(
+                      context,
+                      true,
+                      ContactsModel.withNamePhone(
+                        contactItemVar.name,
+                        contactItemVar.phone,
+                      )),
+                },
               ),
               IconButton(
                 icon: const Icon(Icons.delete),

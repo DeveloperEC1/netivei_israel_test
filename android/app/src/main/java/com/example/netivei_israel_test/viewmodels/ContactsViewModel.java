@@ -1,22 +1,25 @@
 package com.example.netivei_israel_test.viewmodels;
 
+import static com.example.netivei_israel_test.core.Constants.ADD_CONTACT_TYPE;
+import static com.example.netivei_israel_test.core.Constants.BACK_TO_CONTACTS_LIST_TO_FLUTTER;
 import static com.example.netivei_israel_test.core.Constants.CHANNEL;
-import static com.example.netivei_israel_test.core.Constants.DELETE_CONTACT_TYPE;
 import static com.example.netivei_israel_test.core.Constants.DELETE_CONTACT_TO_FLUTTER;
-import static com.example.netivei_israel_test.core.Constants.PERMISSIONS_READ_CONTACTS;
+import static com.example.netivei_israel_test.core.Constants.DELETE_CONTACT_TYPE;
 import static com.example.netivei_israel_test.core.Constants.GET_CONTACTS_TO_FLUTTER;
+import static com.example.netivei_israel_test.core.Constants.PERMISSIONS_READ_CONTACTS;
 import static com.example.netivei_israel_test.core.Constants.PERMISSIONS_WRITE_CONTACTS;
+import static com.example.netivei_israel_test.core.Constants.UPDATE_CONTACT_TYPE;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.ContentResolver;
-import android.content.OperationApplicationException;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
-import android.os.RemoteException;
 import android.provider.ContactsContract;
 
 import androidx.core.app.ActivityCompat;
@@ -30,7 +33,7 @@ public class ContactsViewModel {
 
     private final Activity activity;
     private FlutterEngine flutterEngine;
-    private String callArgumentsStr, contactsStr, typeWriteContacts;
+    private String contactsStr, typeWriteContacts, idArgument, nameArgument, phoneArgument;
 
     public ContactsViewModel(Activity activity) {
         this.activity = activity;
@@ -42,14 +45,6 @@ public class ContactsViewModel {
 
     public void setFlutterEngine(FlutterEngine flutterEngine) {
         this.flutterEngine = flutterEngine;
-    }
-
-    public String getCallArgumentsStr() {
-        return callArgumentsStr;
-    }
-
-    public void setCallArgumentsStr(String callArgumentsStr) {
-        this.callArgumentsStr = callArgumentsStr;
     }
 
     public String getContactsStr() {
@@ -66,6 +61,30 @@ public class ContactsViewModel {
 
     public void setTypeWriteContacts(String typeWriteContacts) {
         this.typeWriteContacts = typeWriteContacts;
+    }
+
+    public String getIdArgument() {
+        return idArgument;
+    }
+
+    public void setIdArgument(String idArgument) {
+        this.idArgument = idArgument;
+    }
+
+    public String getNameArgument() {
+        return nameArgument;
+    }
+
+    public void setNameArgument(String nameArgument) {
+        this.nameArgument = nameArgument;
+    }
+
+    public String getPhoneArgument() {
+        return phoneArgument;
+    }
+
+    public void setPhoneArgument(String phoneArgument) {
+        this.phoneArgument = phoneArgument;
     }
 
     public void handleGetContacts() {
@@ -85,11 +104,31 @@ public class ContactsViewModel {
         getContactsToFlutter();
     }
 
+    public void handleAddContact() {
+        setTypeWriteContacts(ADD_CONTACT_TYPE);
+
+        if (isWriteContactsGranted()) {
+            if (addContact(getNameArgument(), getPhoneArgument())) {
+                backToContactsListToFlutter();
+            }
+        }
+    }
+
+    public void handleUpdateContact() {
+        setTypeWriteContacts(UPDATE_CONTACT_TYPE);
+
+        if (isWriteContactsGranted()) {
+            if (updateContact(getIdArgument(), getNameArgument(), getPhoneArgument())) {
+                backToContactsListToFlutter();
+            }
+        }
+    }
+
     public void handleDeleteContact() {
         setTypeWriteContacts(DELETE_CONTACT_TYPE);
 
         if (isWriteContactsGranted()) {
-            if (deleteContact(getCallArgumentsStr())) {
+            if (deleteContact(getPhoneArgument())) {
                 deleteContactToFlutter();
             }
         }
@@ -117,6 +156,12 @@ public class ContactsViewModel {
         methodChannel.invokeMethod(DELETE_CONTACT_TO_FLUTTER, null);
     }
 
+    private void backToContactsListToFlutter() {
+        MethodChannel methodChannel = new MethodChannel(getFlutterEngine().getDartExecutor().getBinaryMessenger(), CHANNEL);
+        methodChannel.invokeMethod(BACK_TO_CONTACTS_LIST_TO_FLUTTER, null);
+    }
+
+    @SuppressLint("Range")
     private String getContactsDataList() {
         StringBuilder contactsModelString = new StringBuilder("[");
 
@@ -156,28 +201,152 @@ public class ContactsViewModel {
         return contactsModelString.substring(0, contactsModelString.length() - 1) + "]";
     }
 
-    public void updateContact(String contactId, String newNumber) throws RemoteException, OperationApplicationException {
-        ArrayList<ContentProviderOperation> ops = new ArrayList<>();
-        String selectPhone = ContactsContract.Data.CONTACT_ID + "=? AND " + ContactsContract.Data.MIMETYPE + "='" +
-                ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE + "'" + " AND " + ContactsContract.CommonDataKinds.Phone.TYPE + "=?";
-        String[] phoneArgs = new String[]{contactId, String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE_WORK)};
+    public boolean addContact(String name, String phone) {
+        try {
+            ArrayList<ContentProviderOperation> ops = new ArrayList<>();
+            int rawContactInsertIndex = 0;
 
-        ops.add(ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
-                .withSelection(selectPhone, phoneArgs)
-                .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, newNumber)
-                .build());
-        activity.getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+            ops.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+                    .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+                    .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null)
+                    .build());
+
+            ops.add(ContentProviderOperation
+                    .newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactInsertIndex)
+                    .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, name)
+                    .build());
+
+            ops.add(ContentProviderOperation
+                    .newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactInsertIndex)
+                    .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, phone)
+                    .build());
+
+            activity.getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
-    public boolean deleteContact(String phoneNumber) {
-        Uri contactUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
-        Cursor cur = activity.getContentResolver().query(contactUri, null, null, null, null);
+    private final static String[] DATA_COLS = {
+            ContactsContract.Data.MIMETYPE,
+            ContactsContract.Data.DATA1,
+            ContactsContract.Data.CONTACT_ID
+    };
 
+
+    public boolean updateContact(String number, String newName, String newNumber) {
         try {
+            if (number == null || number.trim().isEmpty()) return false;
+            if (newNumber != null && newNumber.trim().isEmpty()) newNumber = null;
+            if (newNumber == null) return false;
+
+            String contactId = getContactId(number);
+
+            if (contactId == null) return false;
+
+            String where = String.format(
+                    "%s = '%s' AND %s = ?",
+                    DATA_COLS[0],
+                    ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE,
+                    DATA_COLS[2]);
+
+            String[] args = {contactId};
+
+            ArrayList<ContentProviderOperation> operations = new ArrayList<>();
+
+            operations.add(
+                    ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
+                            .withSelection(where, args)
+                            .withValue(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, newName)
+                            .build()
+            );
+
+            where = String.format(
+                    "%s = '%s' AND %s = ?",
+                    DATA_COLS[0],
+                    ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
+                    DATA_COLS[1]);
+
+            args[0] = number;
+
+            operations.add(
+                    ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
+                            .withSelection(where, args)
+                            .withValue(DATA_COLS[1], newNumber)
+                            .build()
+            );
+
+            activity.getContentResolver().applyBatch(ContactsContract.AUTHORITY, operations);
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @SuppressLint("Range")
+    public String getContactId(String number) {
+        Cursor cursor = activity.getContentResolver().query(
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                new String[]{ContactsContract.CommonDataKinds.Phone.CONTACT_ID, ContactsContract.CommonDataKinds.Phone.NUMBER},
+                ContactsContract.CommonDataKinds.Phone.NUMBER + "=?",
+                new String[]{number},
+                null
+        );
+
+        if (cursor == null || cursor.getCount() == 0) return null;
+
+        cursor.moveToFirst();
+
+        String id = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
+
+        cursor.close();
+
+        return id;
+    }
+
+//    public boolean updateContact(String contactId, String name, String phone) {
+//        try {
+//            ArrayList<ContentProviderOperation> ops = new ArrayList<>();
+//            String selectPhone = ContactsContract.Data.CONTACT_ID + "=? AND " + ContactsContract.Data.MIMETYPE + "='" +
+//                    ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE + "'" + " AND " + ContactsContract.CommonDataKinds.Phone.TYPE + "=?";
+//            String[] phoneArgs = new String[]{contactId, String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE_WORK)};
+//
+//            ops.add(ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
+//                    .withSelection(selectPhone, phoneArgs)
+//                    .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, phone)
+//                    .build());
+//
+//            ops.add(ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
+//                    .withSelection(selectPhone, phoneArgs)
+//                    .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, name)
+//                    .build());
+//
+//            activity.getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+//
+//            return true;
+//        } catch (Exception e) {
+//            return false;
+//        }
+//    }
+
+    @SuppressLint("Range")
+    public boolean deleteContact(String phoneNumber) {
+        try {
+            Uri contactUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+            @SuppressLint("Recycle") Cursor cur = activity.getContentResolver().query(contactUri, null, null, null, null);
+
             if (cur.moveToFirst()) {
                 do {
                     String lookupKey = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY));
                     Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey);
+
                     activity.getContentResolver().delete(uri, null, null);
                 } while (cur.moveToNext());
             }

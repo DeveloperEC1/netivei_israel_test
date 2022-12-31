@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:netivei_israel_test/data/models/contacts_model.dart';
+import 'package:netivei_israel_test/presentation/pages/page_add_update_contact.dart';
 import 'package:netivei_israel_test/presentation/pages/page_info_contact.dart';
 
 class ShowerPages {
@@ -15,5 +16,12 @@ class ShowerPages {
       BuildContext context, ContactsModel contactItemVar) {
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => PageInfoContact(contactItemVar: contactItemVar)));
+  }
+
+  static void pushPageAddEditContact(
+      BuildContext context, bool isEditCase, ContactsModel contactItemVar) {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => PageAddUpdateContact(
+            isEditCase: isEditCase, contactItemVar: contactItemVar)));
   }
 }
