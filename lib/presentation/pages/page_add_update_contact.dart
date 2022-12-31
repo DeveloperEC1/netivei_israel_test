@@ -98,6 +98,14 @@ class PageAddUpdateContactProvState extends State<PageAddUpdateContactProv> {
         UtilsApp.dividerHeight(context, 20),
         _textFormFieldAddUpdate(_provider.phoneControllerGet,
             TextInputType.phone, 'Please Fill Phone...'),
+        UtilsApp.dividerHeight(context, 20),
+        Text(
+          _provider.textErrorGet,
+          style: const TextStyle(
+            color: Colors.red,
+            fontSize: 15,
+          ),
+        )
       ],
     );
   }

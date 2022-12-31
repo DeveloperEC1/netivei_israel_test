@@ -53,7 +53,7 @@ public class MainActivity extends FlutterActivity {
 
                 contactsViewModel.setFlutterEngine(flutterEngine);
 
-                contactsViewModel.setIdArgument(call.argument("id"));
+                contactsViewModel.setCurrentPhoneArgument(call.argument("currentPhone"));
                 contactsViewModel.setNameArgument(call.argument("name"));
                 contactsViewModel.setPhoneArgument(call.argument("phone"));
 

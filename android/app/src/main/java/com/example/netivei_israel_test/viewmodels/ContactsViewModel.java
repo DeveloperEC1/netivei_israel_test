@@ -14,8 +14,8 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -33,7 +33,7 @@ public class ContactsViewModel {
 
     private final Activity activity;
     private FlutterEngine flutterEngine;
-    private String contactsStr, typeWriteContacts, idArgument, nameArgument, phoneArgument;
+    private String contactsStr, typeWriteContacts, currentPhoneArgument, nameArgument, phoneArgument;
 
     public ContactsViewModel(Activity activity) {
         this.activity = activity;
@@ -63,12 +63,12 @@ public class ContactsViewModel {
         this.typeWriteContacts = typeWriteContacts;
     }
 
-    public String getIdArgument() {
-        return idArgument;
+    public String getCurrentPhoneArgument() {
+        return currentPhoneArgument;
     }
 
-    public void setIdArgument(String idArgument) {
-        this.idArgument = idArgument;
+    public void setCurrentPhoneArgument(String currentPhoneArgument) {
+        this.currentPhoneArgument = currentPhoneArgument;
     }
 
     public String getNameArgument() {
@@ -118,7 +118,7 @@ public class ContactsViewModel {
         setTypeWriteContacts(UPDATE_CONTACT_TYPE);
 
         if (isWriteContactsGranted()) {
-            if (updateContact(getIdArgument(), getNameArgument(), getPhoneArgument())) {
+            if (updateContact(getCurrentPhoneArgument(), getNameArgument(), getPhoneArgument())) {
                 backToContactsListToFlutter();
             }
         }
@@ -239,14 +239,13 @@ public class ContactsViewModel {
             ContactsContract.Data.CONTACT_ID
     };
 
-
-    public boolean updateContact(String number, String newName, String newNumber) {
+    public boolean updateContact(String currentPhone, String newName, String newPhone) {
         try {
-            if (number == null || number.trim().isEmpty()) return false;
-            if (newNumber != null && newNumber.trim().isEmpty()) newNumber = null;
-            if (newNumber == null) return false;
+            if (currentPhone == null || currentPhone.trim().isEmpty()) return false;
+            if (newPhone != null && newPhone.trim().isEmpty()) newPhone = null;
+            if (newPhone == null) return false;
 
-            String contactId = getContactId(number);
+            String contactId = getContactId(currentPhone);
 
             if (contactId == null) return false;
 
@@ -264,8 +263,7 @@ public class ContactsViewModel {
                     ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
                             .withSelection(where, args)
                             .withValue(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, newName)
-                            .build()
-            );
+                            .build());
 
             where = String.format(
                     "%s = '%s' AND %s = ?",
@@ -273,14 +271,13 @@ public class ContactsViewModel {
                     ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
                     DATA_COLS[1]);
 
-            args[0] = number;
+            args[0] = currentPhone;
 
             operations.add(
                     ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
                             .withSelection(where, args)
-                            .withValue(DATA_COLS[1], newNumber)
-                            .build()
-            );
+                            .withValue(DATA_COLS[1], newPhone)
+                            .build());
 
             activity.getContentResolver().applyBatch(ContactsContract.AUTHORITY, operations);
 
@@ -310,31 +307,6 @@ public class ContactsViewModel {
 
         return id;
     }
-
-//    public boolean updateContact(String contactId, String name, String phone) {
-//        try {
-//            ArrayList<ContentProviderOperation> ops = new ArrayList<>();
-//            String selectPhone = ContactsContract.Data.CONTACT_ID + "=? AND " + ContactsContract.Data.MIMETYPE + "='" +
-//                    ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE + "'" + " AND " + ContactsContract.CommonDataKinds.Phone.TYPE + "=?";
-//            String[] phoneArgs = new String[]{contactId, String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE_WORK)};
-//
-//            ops.add(ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
-//                    .withSelection(selectPhone, phoneArgs)
-//                    .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, phone)
-//                    .build());
-//
-//            ops.add(ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
-//                    .withSelection(selectPhone, phoneArgs)
-//                    .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, name)
-//                    .build());
-//
-//            activity.getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
-//
-//            return true;
-//        } catch (Exception e) {
-//            return false;
-//        }
-//    }
 
     @SuppressLint("Range")
     public boolean deleteContact(String phoneNumber) {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:netivei_israel_test/data/models/contacts_model.dart';
 import 'package:provider/provider.dart';
 import '../../../utils/constants.dart';
 import '../../../utils/utils_app.dart';
@@ -8,10 +7,13 @@ import 'provider_contacts_list.dart';
 class ProviderAddUpdateContact extends ChangeNotifier {
   late TextEditingController _nameController = TextEditingController();
   late TextEditingController _phoneController = TextEditingController();
+  String _textError = "";
 
   TextEditingController get nameControllerGet => _nameController;
 
   TextEditingController get phoneControllerGet => _phoneController;
+
+  String get textErrorGet => _textError;
 
   void setNameController(value) {
     _nameController = TextEditingController(text: value);
@@ -23,12 +25,23 @@ class ProviderAddUpdateContact extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setTextError(String textError) {
+    _textError = textError;
+    notifyListeners();
+  }
+
   void handleSaveClick(
-      bool isEditCase, String currentPhone, String name, String newPhone) {
-    if (isEditCase) {
-      updateContact(currentPhone, name, newPhone);
+      bool isEditCase, String currentPhone, String newName, String newPhone) {
+    if (newName.isEmpty || newPhone.isEmpty) {
+      setTextError('Please fill in all the fields...');
     } else {
-      addContact(name, newPhone);
+      setTextError('');
+
+      if (isEditCase) {
+        updateContact(currentPhone, newName, newPhone);
+      } else {
+        addContact(newName, newPhone);
+      }
     }
   }
 
@@ -39,10 +52,10 @@ class ProviderAddUpdateContact extends ChangeNotifier {
     );
   }
 
-  void updateContact(String id, String name, String phone) {
+  void updateContact(String currentPhone, String name, String phone) {
     UtilsApp.platform.invokeMethod(
       Constants.HANDLE_UPDATE_CONTACT,
-      {"id": id, "name": name, "phone": phone},
+      {"currentPhone": currentPhone, "name": name, "phone": phone},
     );
   }
 
