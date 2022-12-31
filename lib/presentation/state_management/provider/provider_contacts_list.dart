@@ -17,6 +17,11 @@ class ProviderContactsList extends ChangeNotifier {
     notifyListeners();
   }
 
+  void deleteContactFromList() {
+    contactsModelListGet.removeAt(indexListGet);
+    notifyListeners();
+  }
+
   void setIndexList(int indexList) {
     _indexList = indexList;
   }
@@ -28,11 +33,6 @@ class ProviderContactsList extends ChangeNotifier {
   void deleteContact(String phoneNumber) {
     UtilsApp.platform
         .invokeMethod(Constants.HANDLE_DELETE_CONTACT, phoneNumber);
-  }
-
-  void deleteContactFromList() {
-    contactsModelListGet.removeAt(indexListGet);
-    notifyListeners();
   }
 
   List<ContactsModel> convertStringToListContactsModel(var value) {
