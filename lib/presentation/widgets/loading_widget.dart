@@ -10,6 +10,5 @@ class LoadingWidget extends StatelessWidget {
         valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurple),
       ),
     );
-    ;
   }
 }

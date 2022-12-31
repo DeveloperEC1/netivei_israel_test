@@ -4,6 +4,7 @@ import 'package:netivei_israel_test/utils/constants.dart';
 import 'package:provider/provider.dart';
 
 import '../presentation/state_management/provider/provider_contacts_list.dart';
+import 'responsive_screen.dart';
 
 class UtilsApp {
   static final UtilsApp _singleton = UtilsApp._internal();
@@ -30,5 +31,11 @@ class UtilsApp {
         providerContactsList.deleteContactFromList();
       }
     });
+  }
+
+  static Widget dividerHeight(BuildContext context, double height) {
+    return SizedBox(
+      height: ResponsiveScreen().heightMediaQuery(context, height),
+    );
   }
 }

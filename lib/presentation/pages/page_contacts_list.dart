@@ -75,7 +75,7 @@ class PageContactsListProvState extends State<PageContactsListProv> {
       return const LoadingWidget();
     } else {
       return Padding(
-        padding: const EdgeInsets.all(8),
+        padding: EdgeInsets.all(ResponsiveScreen().widthMediaQuery(context, 8)),
         child: ListView.separated(
           itemCount: _provider.contactsModelListGet.length,
           itemBuilder: (context, index) {

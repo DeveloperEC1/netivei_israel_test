@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:netivei_israel_test/data/models/contacts_model.dart';
+import '../../utils/responsive_screen.dart';
 
 class PageInfoContact extends StatelessWidget {
   final ContactsModel contactItemVar;
@@ -13,7 +14,7 @@ class PageInfoContact extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _appBar(),
-      body: _body(),
+      body: _body(context),
     );
   }
 
@@ -29,9 +30,9 @@ class PageInfoContact extends StatelessWidget {
     );
   }
 
-  Widget _body() {
+  Widget _body(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.all(ResponsiveScreen().widthMediaQuery(context, 8)),
       child: Column(
         children: [
           _textContactItem('Name: ', contactItemVar.name),
