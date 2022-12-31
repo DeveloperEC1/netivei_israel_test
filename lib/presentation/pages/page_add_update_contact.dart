@@ -52,10 +52,10 @@ class PageAddUpdateContactProvState extends State<PageAddUpdateContactProv> {
     _provider = Provider.of<ProviderAddUpdateContact>(context, listen: false);
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _provider.setNameController(
-          widget.isEditCase ? widget.contactItemVar.name : '');
-      _provider.setPhoneController(
-          widget.isEditCase ? widget.contactItemVar.phone : '');
+      _provider.setNameAndPhoneController(
+        widget.isEditCase ? widget.contactItemVar.name : '',
+        widget.isEditCase ? widget.contactItemVar.phone : '',
+      );
     });
   }
 

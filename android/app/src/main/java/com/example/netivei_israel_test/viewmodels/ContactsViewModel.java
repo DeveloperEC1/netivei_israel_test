@@ -233,14 +233,14 @@ public class ContactsViewModel {
         }
     }
 
-    private final static String[] DATA_COLS = {
-            ContactsContract.Data.MIMETYPE,
-            ContactsContract.Data.DATA1,
-            ContactsContract.Data.CONTACT_ID
-    };
-
     public boolean updateContact(String currentPhone, String newName, String newPhone) {
         try {
+            String[] DATA_COLS = {
+                    ContactsContract.Data.MIMETYPE,
+                    ContactsContract.Data.DATA1,
+                    ContactsContract.Data.CONTACT_ID
+            };
+
             if (currentPhone == null || currentPhone.trim().isEmpty()) return false;
             if (newPhone != null && newPhone.trim().isEmpty()) newPhone = null;
             if (newPhone == null) return false;

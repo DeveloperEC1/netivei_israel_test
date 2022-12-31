@@ -15,13 +15,9 @@ class ProviderAddUpdateContact extends ChangeNotifier {
 
   String get textErrorGet => _textError;
 
-  void setNameController(value) {
-    _nameController = TextEditingController(text: value);
-    notifyListeners();
-  }
-
-  void setPhoneController(value) {
-    _phoneController = TextEditingController(text: value);
+  void setNameAndPhoneController(String name, String phone) {
+    _nameController = TextEditingController(text: name);
+    _phoneController = TextEditingController(text: phone);
     notifyListeners();
   }
 
