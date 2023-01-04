@@ -5,8 +5,8 @@ import '../../../utils/utils_app.dart';
 import 'provider_contacts_list.dart';
 
 class ProviderAddUpdateContact extends ChangeNotifier {
-  late TextEditingController _nameController = TextEditingController();
-  late TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   String _textError = "";
 
   TextEditingController get nameControllerGet => _nameController;
@@ -15,15 +15,14 @@ class ProviderAddUpdateContact extends ChangeNotifier {
 
   String get textErrorGet => _textError;
 
-  void setNameAndPhoneController(String name, String phone) {
-    _nameController = TextEditingController(text: name);
-    _phoneController = TextEditingController(text: phone);
-    notifyListeners();
-  }
-
   void setTextError(String textError) {
     _textError = textError;
     notifyListeners();
+  }
+
+  void setNameAndPhoneController(String name, String phone) {
+    nameControllerGet.text = name;
+    phoneControllerGet.text = phone;
   }
 
   void handleSaveClick(

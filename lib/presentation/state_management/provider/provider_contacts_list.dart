@@ -55,8 +55,6 @@ class ProviderContactsList extends ChangeNotifier {
 
       return contactsModelList;
     } catch (err) {
-      print(err);
-
       return [];
     }
   }
