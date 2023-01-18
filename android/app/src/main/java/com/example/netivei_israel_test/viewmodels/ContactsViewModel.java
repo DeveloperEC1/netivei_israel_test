@@ -262,7 +262,7 @@ public class ContactsViewModel {
             operations.add(
                     ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
                             .withSelection(where, args)
-                            .withValue(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, newName)
+                            .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, newName)
                             .build());
 
             where = String.format(
