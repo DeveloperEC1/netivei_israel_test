@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:netivei_israel_test/data/models/contacts_model.dart';
-import '../../utils/responsive_screen.dart';
+import '../../data/models/contacts_model.dart';
+import '../utils/responsive_screen.dart';
 
 class PageInfoContact extends StatelessWidget {
   final ContactsModel contactItemVar;

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:netivei_israel_test/presentation/widgets/loading_widget.dart';
-import 'package:netivei_israel_test/utils/utils_app.dart';
 import 'package:provider/provider.dart';
 import '../../data/models/contacts_model.dart';
-import '../../utils/responsive_screen.dart';
-import '../../utils/shower_pages.dart';
+import '../../presentation/utils/responsive_screen.dart';
+import '../../presentation/utils/shower_pages.dart';
 import '../state_management/provider/provider_contacts_list.dart';
+import '../utils/utils_app.dart';
+import '../widgets/loading_widget.dart';
 
 class PageContactsList extends StatelessWidget {
   const PageContactsList({Key? key}) : super(key: key);

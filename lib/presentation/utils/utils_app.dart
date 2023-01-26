@@ -1,11 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:netivei_israel_test/presentation/state_management/provider/provider_add_update_contact.dart';
-import 'package:netivei_israel_test/utils/constants.dart';
 import 'package:provider/provider.dart';
-
-import '../presentation/state_management/provider/provider_contacts_list.dart';
 import 'responsive_screen.dart';
+import '../../core/constants.dart';
+import '../state_management/provider/provider_add_update_contact.dart';
+import '../state_management/provider/provider_contacts_list.dart';
 
 class UtilsApp {
   static final UtilsApp _singleton = UtilsApp._internal();

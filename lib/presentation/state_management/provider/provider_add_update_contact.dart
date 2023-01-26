@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../utils/constants.dart';
-import '../../../utils/utils_app.dart';
 import 'provider_contacts_list.dart';
+import '../../../core/constants.dart';
+import '../../utils/utils_app.dart';
 
 class ProviderAddUpdateContact extends ChangeNotifier {
   final TextEditingController _nameController = TextEditingController();

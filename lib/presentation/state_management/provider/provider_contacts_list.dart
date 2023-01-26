@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../../data/models/contacts_model.dart';
-import '../../../utils/constants.dart';
-import '../../../utils/utils_app.dart';
+import '../../../core/constants.dart';
+import '../../utils/utils_app.dart';
 
 class ProviderContactsList extends ChangeNotifier {
   List<ContactsModel> _contactsModelList = [];

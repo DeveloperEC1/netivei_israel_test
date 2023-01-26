@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:netivei_israel_test/presentation/state_management/provider/provider_add_update_contact.dart';
-import 'package:netivei_israel_test/utils/utils_app.dart';
 import 'package:provider/provider.dart';
 import '../../data/models/contacts_model.dart';
+import '../state_management/provider/provider_add_update_contact.dart';
+import '../utils/utils_app.dart';
 
 class PageAddUpdateContact extends StatelessWidget {
   final bool isEditCase;
